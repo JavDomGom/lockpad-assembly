@@ -1,28 +1,44 @@
-#include <stdio.h>
 #include <Servo.h>
 
-Servo sA, sB;
- 
+Servo myservo;  // create servo object to control a servo
+// twelve servo objects can be created on most boards
+
+int pos = 0;    // variable to store the servo position
+int incomingByte = 0;   // for incoming serial data
+
 void setup() {
   Serial.begin(9600);
-  sA.attach(8);
-  sB.attach(9);
+  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
+}
 
-  sA.write(0);
-  sB.write(0);
-}
- 
+
+
 void loop() {
-  for(int b = 0;b < 180;b+=18){
-    sB.write(b);
-    
-    for(int a = 0;a < 180;a+=18){
-      char log[10];
-      sprintf(log, "%3d\t%3d", a, b);
-      Serial.println(log);
-      
-      sA.write(a);
-      delay(250);
-    }
-  }
-}
+
+        // send data only when you receive data:
+        if (Serial.available() > 0) {
+                // read the incoming byte:
+                incomingByte = Serial.read();
+
+                if(incomingByte != 10) {
+                  // say what you got:
+                  Serial.print("received: ");
+                  Serial.print (incomingByte);
+                  
+                  if(incomingByte == 108){
+                   Serial.println(" sent 0 Rotaing CW "); 
+                   myservo.write(0); 
+                  }else if(incomingByte == 114){
+                    Serial.println(" sent 180 Rotaing CCW "); 
+                    myservo.write(180); 
+                  }else if(incomingByte == 60){
+                    Serial.println(" sent Stopped "); 
+                    myservo.write(60); 
+                  }
+                }
+                  
+                 
+        }
+
+  
+} 
